@@ -1,15 +1,23 @@
 package com.qwerfah.sort
 package algorithm
 
+import com.qwerfah.sort.compare.SeqGenerator
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import scala.math.Ordering.Implicits._
 
 trait SortAlgorithmSpec extends AnyFlatSpec with Matchers:
   def test(algo: SortAlgorithm): Unit =
-    val intSeq = List(5, 4, 3, 2, 1, 2, 3, 4, 5)
-    val doubleSeq = List(5D, 4D, 3D, 2D, 1D, 2D, 3D, 4D, 5D)
-    val charSeq = List('b', 'c', 'f', 'd', 'j', 'a')
+    val intSeq = compare.Implicits.RandomIntGenerator.generate(30)
+    val shortSeq = compare.Implicits.RandomShortGenerator.generate(30)
+    val longSeq = compare.Implicits.RandomLongGenerator.generate(30)
+    val doubleSeq = compare.Implicits.RandomDoubleGenerator.generate(30)
+    val charSeq = compare.Implicits.RandomCharGenerator.generate(30)
+    val byteSeq = compare.Implicits.RandomByteGenerator.generate(30)
 
-    algo.sort(intSeq) shouldBe List(1, 2, 2, 3, 3, 4, 4, 5, 5)
-    algo.sort(doubleSeq) shouldBe List(1D, 2D, 2D, 3D, 3D, 4D, 4D, 5D, 5D)
-    algo.sort(charSeq) shouldBe List('a', 'b', 'c', 'd', 'f', 'j')
+    algo.sort(intSeq) shouldBe intSeq.sorted
+    algo.sort(shortSeq) shouldBe shortSeq.sorted
+    algo.sort(longSeq) shouldBe longSeq.sorted
+    algo.sort(doubleSeq) shouldBe doubleSeq.sorted
+    algo.sort(charSeq) shouldBe charSeq.sorted
+    algo.sort(byteSeq) shouldBe byteSeq.sorted
