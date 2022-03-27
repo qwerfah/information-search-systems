@@ -1,9 +1,13 @@
 package com.qwerfah.sort
 
 import algorithm._
+import compare._
+import compare.Implicits._
 
 object Main extends App:
-  val sort = SelectionSort()
-  import scala.math.Integral.Implicits._
-  print(sort.sort(List(5, 4, 3, 2, 1)))
+  val algorithms = BubbleSort() :: SelectionSort() :: QuickSort() :: Nil
+  val comparator = Comparator[Int](algorithms)
+
+  val results = comparator.compare(100, 1000, 100)
+  print(results)
 
