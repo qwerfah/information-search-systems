@@ -15,9 +15,9 @@ trait SortAlgorithmSpec extends AnyFlatSpec with Matchers:
     val charSeq = compare.Implicits.RandomCharGenerator.generate(30)
     val byteSeq = compare.Implicits.RandomByteGenerator.generate(30)
 
-    algo.sort(intSeq) shouldBe intSeq.sorted
-    algo.sort(shortSeq) shouldBe shortSeq.sorted
-    algo.sort(longSeq) shouldBe longSeq.sorted
-    algo.sort(doubleSeq) shouldBe doubleSeq.sorted
-    algo.sort(charSeq) shouldBe charSeq.sorted
-    algo.sort(byteSeq) shouldBe byteSeq.sorted
+    algo.sort(intSeq)._1 shouldBe intSeq.sorted
+    algo.sort(shortSeq)._1 shouldBe shortSeq.sorted
+    algo.sort(longSeq)._1 shouldBe longSeq.sorted
+    algo.sort(doubleSeq)._1 shouldBe doubleSeq.sorted
+    algo.sort(charSeq)._1 shouldBe charSeq.sorted
+    algo.sort(byteSeq)._1 shouldBe byteSeq.sorted

@@ -6,6 +6,17 @@ import scala.util.Random
 trait SeqGenerator[T]:
   def generate(length: Int): Seq[T]
 
+enum Order:
+  case Direct, Reverse
+
+trait SequentialIntGenerator extends SeqGenerator[Int]:
+  def order: Order
+  override def generate(length: Int): Seq[Int] =
+    order match
+      case Order.Direct => Range.Int(0, 1000, (1000D / length.toDouble).ceil.toInt)
+      case Order.Reverse => Range.Int(1000, 0, (-1000D / length.toDouble).ceil.toInt)
+
+
 trait RandomIntGenerator extends SeqGenerator[Int]:
   override def generate(length: Int): Seq[Int] =
     0 until length map { _ => Random.nextInt }
