@@ -42,9 +42,9 @@ trait RandomByteGenerator extends SeqGenerator[Byte]:
     Random.nextBytes(length)
 
 object Implicits:
-  implicit object RandomIntGenerator    extends RandomIntGenerator
-  implicit object RandomShortGenerator  extends RandomShortGenerator
-  implicit object RandomLongGenerator   extends RandomLongGenerator
-  implicit object RandomDoubleGenerator extends RandomDoubleGenerator
-  implicit object RandomCharGenerator   extends RandomCharGenerator
-  implicit object RandomByteGenerator   extends RandomByteGenerator
+  given RandomIntGenerator:    SeqGenerator[Int]    with RandomIntGenerator
+  given RandomShortGenerator:  SeqGenerator[Short]  with RandomShortGenerator
+  given RandomLongGenerator:   SeqGenerator[Long]   with RandomLongGenerator
+  given RandomDoubleGenerator: SeqGenerator[Double] with RandomDoubleGenerator
+  given RandomCharGenerator:   SeqGenerator[Char]   with RandomCharGenerator
+  given RandomByteGenerator:   SeqGenerator[Byte]   with RandomByteGenerator

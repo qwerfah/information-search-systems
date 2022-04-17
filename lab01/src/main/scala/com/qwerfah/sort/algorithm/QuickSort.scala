@@ -7,7 +7,7 @@ import scala.util.Random
 final case class QuickSort() extends SortAlgorithm:
   override val code: String = "quick_sort"
 
-  override def sort[T](sequence: Seq[T])(implicit order: Ordering[T]): (Seq[T], SortStats) =
+  override def sort[T](sequence: Seq[T])(using order: Ordering[T]): (Seq[T], SortStats) =
     def recur(seq: Seq[T]): Seq[T] =
       if seq.length <= 1 then seq
       else
@@ -21,7 +21,7 @@ final case class QuickSort() extends SortAlgorithm:
 final case class QuickSortSE() extends SortAlgorithm:
   override val code: String = "quick_sort"
 
-  override def sort[T](sequence: Seq[T])(implicit order: Ordering[T]): (Seq[T], SortStats) =
+  override def sort[T](sequence: Seq[T])(using order: Ordering[T]): (Seq[T], SortStats) =
     /** Вся суть функции заключена в производимом ей side-эффекте путем сортировки прямо в переданной ей коллекции, а
       * потому является СМЕРТНЫМ ГРЕХОМ и не рекомендуется к употреблению.
       */

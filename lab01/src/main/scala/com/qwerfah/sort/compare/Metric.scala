@@ -9,7 +9,7 @@ trait Metric[T, R]:
   def calc(seq: Seq[T], algo: SortAlgorithm, iters: Int): R
 
 /** Метрика - времмя работы алгоритма, оценивается как среднее из указанного числа прогонов. */
-final case class TimeMetric[T]()(implicit integral: Integral[T]) extends Metric[T, Double]:
+final case class TimeMetric[T]()(using integral: Integral[T]) extends Metric[T, Double]:
   override val code: String = "Время, мс"
   
   override def calc(seq: Seq[T], algo: SortAlgorithm, iters: Int): Double =
@@ -21,7 +21,7 @@ final case class TimeMetric[T]()(implicit integral: Integral[T]) extends Metric[
     time.sum.toDouble / time.length.toDouble
 
 /** Метрика - число операций сравнения за прогон. */
-final case class CompareMetric[T]()(implicit integral: Integral[T]) extends Metric[T, Double]:
+final case class CompareMetric[T]()(using integral: Integral[T]) extends Metric[T, Double]:
   override val code: String = "Кол-во сравнений"
 
   override def calc(seq: Seq[T], algo: SortAlgorithm, iters: Int): Double =
@@ -35,7 +35,7 @@ final case class CompareMetric[T]()(implicit integral: Integral[T]) extends Metr
   * так как традиционные функциональные реализации не подразумевают перестановок внутри коллекций, исходя из
   * предположения об их иммутабельности.
   */
-final class PermuteMetric[T](implicit integral: Integral[T]) extends Metric[T, Double]:
+final class PermuteMetric[T](using integral: Integral[T]) extends Metric[T, Double]:
   override val code: String = "Кол-во перестановок"
 
   override def calc(seq: Seq[T], algo: SortAlgorithm, iters: Int): Double =

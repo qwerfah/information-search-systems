@@ -2,7 +2,7 @@ package com.qwerfah.sort
 
 import algorithm._
 import compare._
-import compare.Implicits._
+import compare.Implicits.given
 
 import breeze.linalg._
 import breeze.plot._

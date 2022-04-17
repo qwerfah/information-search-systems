@@ -7,7 +7,7 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.ExecutionContext.Implicits.given
 import scala.concurrent.duration.Duration
 
-case class Comparator[T](algorithms: Seq[SortAlgorithm], metric: Metric[T, _])(implicit
+case class Comparator[T](algorithms: Seq[SortAlgorithm], metric: Metric[T, _])(using
     generator: SeqGenerator[T],
     integral: Integral[T]
 ):

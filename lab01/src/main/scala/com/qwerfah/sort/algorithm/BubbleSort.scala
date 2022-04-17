@@ -8,7 +8,7 @@ import spire.std.seq
 final case class BubbleSort() extends SortAlgorithm:
   override val code: String = "bubble_sort"
 
-  override def sort[T](sequence: Seq[T])(implicit order: Ordering[T]): (Seq[T], SortStats) =
+  override def sort[T](sequence: Seq[T])(using order: Ordering[T]): (Seq[T], SortStats) =
 
     def iter(seq: Seq[T]): (Seq[T], Boolean) =
       val res = seq.tail.foldLeft((Seq.empty[T], seq.head, false)) { case ((res, prev, flag), curr) =>
@@ -26,7 +26,7 @@ final case class BubbleSort() extends SortAlgorithm:
 final case class BubbleSortSE() extends SortAlgorithm:
   override val code: String = "bubble_sort"
 
-  override def sort[T](sequence: Seq[T])(implicit order: Ordering[T]): (Seq[T], SortStats) =
+  override def sort[T](sequence: Seq[T])(using order: Ordering[T]): (Seq[T], SortStats) =
     val seqCopy = MutableSeq(sequence: _*)
     var permutations = 0
     var comparisons = 0

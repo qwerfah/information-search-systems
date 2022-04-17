@@ -3,7 +3,7 @@ package algorithm
 
 trait SortAlgorithm:
   def code: String
-  def sort[T](sequence: Seq[T])(implicit order: Ordering[T]): (Seq[T], SortStats)
+  def sort[T](sequence: Seq[T])(using order: Ordering[T]): (Seq[T], SortStats)
 
 
 final case class SortStats(permutations: Int = 0, comparisons: Int = 0):
