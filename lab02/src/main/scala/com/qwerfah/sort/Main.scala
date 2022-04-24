@@ -15,8 +15,8 @@ object Main extends App {
   import ClassTags.given
   import Conversions.given
 
-  val balancedMerging = new BalancedMerging(5, 5)
-  println(balancedMerging.sort("input", "output1", " " :: "\n" :: Nil))
+//  val balancedMerging = BalancedMerging(5, 5)
+//  println(balancedMerging.sort("input", "output1", " " :: "\n" :: Nil))
 
   val devices =
     LocalDevice("dev1", 3) :: LocalDevice("dev2", 3) :: LocalDevice("dev3", 3) :: LocalDevice("dev4", 3) :: Nil

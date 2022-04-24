@@ -9,7 +9,7 @@ import scala.io.BufferedSource
 import scala.reflect.ClassTag
 import scala.util.Try
 
-class BalancedMerging(deviceCount: Int, blockLength: Int) extends FileSort:
+final case class BalancedMerging(deviceCount: Int, blockLength: Int) extends FileSort:
   require(deviceCount > 0, "Round robin queue length must be positive")
   require(blockLength > 0, "Input file block length must be positive")
 
@@ -48,7 +48,8 @@ class BalancedMerging(deviceCount: Int, blockLength: Int) extends FileSort:
       // Читаем из входных файлов, пока не прочитаем все
       while inputs.nonEmpty do
         val block = formBlock(inputs, currBlockLen) // Формируем новый блок из первых блоков всех входных файлов
-        writers(outputs.next()).write(block.mkString(delimeters.head)) // записываем очередной блок в следующий файл из round-robin
+        writers(outputs.next())
+          .write(block.mkString(delimeters.head)) // записываем очередной блок в следующий файл из round-robin
         inputs = inputs.filter(_.hasNext) // Оставляем только еще недочитанные файлы
 
       writers.foreach(_.close())
@@ -87,7 +88,7 @@ class BalancedMerging(deviceCount: Int, blockLength: Int) extends FileSort:
     val delim = delimeters.head
 
     while fileIterator.hasNext do
-      val block = fileIterator.take(blockLength).toList
+      val block = fileIterator.take(blockLength).toSeq
       val sorted = block.map(conversion(_)).sorted
       print(s"${sorted.mkString(delim)}\n")
       writers(roundRobin.next).write(s"${sorted.mkString(delim)}$delim")

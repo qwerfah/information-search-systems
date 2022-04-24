@@ -22,7 +22,7 @@ import scala.concurrent.duration.Duration
   val compareComparator = Comparator[Int](algorithms, compareMetric)
   val permuteComparator = Comparator[Int](algorithms, permuteMetric)
 
-  val timeResultsF = timeComparator.compareAsync(100, 1000, 10, 100)
+  val timeResultsF = timeComparator.compareAsync(100, 100000, 1000, 100)
   val compareResultsF = Future {
     print("DEBUG: comparisons comparison scheduled\n")
     val results = compareComparator.compare(100, 1000, 10, 1)

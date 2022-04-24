@@ -6,7 +6,7 @@ object BlockOps:
     */
   def merge[T](blocks: Seq[Seq[T]])(using order: Ordering[T]): Seq[T] =
     val (newBlocks, sorted) =
-      blocks.flatMap(_.indices).foldLeft(blocks -> List.empty[T]) { case ((blocks, sorted), _) =>
+      blocks.flatMap(_.indices).foldLeft(blocks -> Seq.empty[T]) { case ((blocks, sorted), _) =>
         val (min, minInd) =
           blocks.zipWithIndex.tail.foldLeft(blocks.head.head -> 0) { case ((min, minInd), (block, blockInd)) =>
             if order.compare(block.head, min) < 0 then block.head -> blockInd

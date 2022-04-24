@@ -9,20 +9,21 @@ final case class LocalDevice(override val id: String, override val blockLength: 
   val files: MutableStack[File] = MutableStack.empty
   val fileSizes: MutableStack[Int] = MutableStack.empty
 
-  override def lastFileSize: Int = fileSizes.head
+  override def lastFileSize: Option[Int] = fileSizes.headOption
+
+  override def nonEmpty: Boolean = files.nonEmpty
 
   override def write[T](blocks: Seq[Seq[T]], delim: String)(using order: Ordering[T]): Unit =
     val file = new File(s"$id#file#${files.length}")
     val writer = new PrintWriter(file)
-    val blocksPerBlock = math.ceil(blocks.head.length.toDouble / blockLength.toDouble).toInt
-    val blockCount = blocks.length
 
-    if blockCount == 1 then writer.println(blocks.head.sorted.map(_.toString).mkString(delim))
-    else writer.println(BlockOps.merge(blocks).map(_.toString).mkString(delim))
+    val block = if blocks.length == 1 then blocks.head.sorted else BlockOps.merge(blocks)
+    val blockCount = math.ceil(block.length.toDouble / blockLength.toDouble).toInt
+    writer.write(block.map(_.toString).mkString(delim))
 
     writer.close()
     files.push(file)
-    fileSizes.push(blockCount * blocksPerBlock)
+    fileSizes.push(blockCount)
 
   override def read[T](delim: String)(using conversion: Conversion[String, T]): Seq[T] =
     if files.isEmpty then Seq.empty
