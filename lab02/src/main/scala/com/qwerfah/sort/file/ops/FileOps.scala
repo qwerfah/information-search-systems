@@ -8,6 +8,12 @@ object FileOps:
   def fileIterator(input: String, delimeters: Seq[String]): Iterator[String] =
     fileIterator(new File(input), delimeters)
 
+  /** Создает итератор по файлу, который считывает данные из файла токенами с помощью экземпляра Scanner. Границы
+    * каждого токена определяются списком разделителей. Итератор может быть использован для чтения из файла блоками с
+    * помощью take().toList. Как только итератор достигнет конца файла, используемый для чтения из файла Scanner будет
+    * освобожден, а каждая последующая попытка считать блок токенов из файла будет возвращать пустую
+    * последовательность.
+    */
   def fileIterator(input: File, delimeters: Seq[String]): Iterator[String] =
     val scanner = new Scanner(input)
     scanner.useDelimiter(delimeters.mkString("|"))

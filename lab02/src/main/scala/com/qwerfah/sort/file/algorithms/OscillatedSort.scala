@@ -11,6 +11,9 @@ import scala.reflect.ClassTag
 import scala.util.Try
 
 final case class OscillatedSort(devices: Seq[Device], blockLength: Int) extends FileSort:
+  require(devices.nonEmpty)
+  require(blockLength > 0)
+
   override def code: String = "OscillatedSort"
 
   private val splitBound = devices.length - 1
