@@ -21,7 +21,7 @@ final case class OscillatedSort(devices: Seq[Device], blockLength: Int) extends 
   def sort[T: ClassTag](input: String, output: String, delimeters: Seq[String])(using
       conversion: Conversion[String, T],
       order: Ordering[T]
-  ): Try[Unit] = Try {
+  ): Try[Int] = Try {
     // Кольцевая очередь файлов для распределения блоков из исходного файла
     val splitRoundRobin = Iterator.continually(devices.indices).flatten
     // Кольцевая очередь файлов для слияния распределенных блоков
@@ -36,16 +36,22 @@ final case class OscillatedSort(devices: Seq[Device], blockLength: Int) extends 
       devices(splitRoundRobin.next).write(Seq(block), delim)
       mergeIfReady(delim, mergeRoundRobin)
 
-    val rest = Iterator.continually(devices.map(_.read(delim)).filter(_.nonEmpty)).takeWhile(_.nonEmpty)
+    val rest = Iterator
+      .continually(devices.map(dev => dev.lastFileSize.getOrElse(0) -> dev.read(delim)).filter(_._2.nonEmpty))
+      .takeWhile(_.nonEmpty)
+    var outputSize = 0
 
     while rest.hasNext do
-      val blocks = rest.next
-      if blocks.length == 1 then
+      val blocksWithSizes = rest.next
+      if blocksWithSizes.length == 1 then
         assert(!rest.hasNext)
         val resultWriter = new PrintWriter(new File(output))
-        resultWriter.write(blocks.head.mkString(delimeters.head))
+        resultWriter.write(blocksWithSizes.head._2.mkString(delimeters.head))
         resultWriter.close()
-      else devices(mergeRoundRobin.next).write(blocks, delim)
+        outputSize = blocksWithSizes.head._1
+      else devices(mergeRoundRobin.next).write(blocksWithSizes.map(_._2), delim)
+
+    outputSize
   }
 
   /** Сливает (devices.length - 1) блоков одинакого размера в один и записывает в очередное устройство из очереди

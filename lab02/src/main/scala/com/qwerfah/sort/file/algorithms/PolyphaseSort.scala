@@ -4,7 +4,8 @@ import com.qwerfah.sort.file.algorithms.FileSort
 import com.qwerfah.sort.file.devices.Device
 import com.qwerfah.sort.file.ops.{BlockOps, FileOps}
 
-import java.io.File
+import java.io.{File, PrintWriter}
+import java.nio.file.{Files, Paths, StandardOpenOption}
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.util.Try
@@ -18,9 +19,11 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
   def sort[T: ClassTag](input: String, output: String, delimeters: Seq[String])(using
       conversion: Conversion[String, T],
       order: Ordering[T]
-  ): Try[Unit] = Try {
+  ): Try[Int] = Try {
     val levels = splitStage(input, delimeters)
-    mergeStage(output, delimeters, levels)
+    val outputSize = mergeStage(output, delimeters, levels)
+    Files.write(Paths.get(output), " \n".getBytes(), StandardOpenOption.APPEND)
+    outputSize
   }
 
   def splitStage[T](input: String, delimeters: Seq[String])(using
@@ -47,7 +50,9 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
   def mergeStage[T](output: String, delimeters: Seq[String], levels: Int)(using
       conversion: Conversion[String, T],
       order: Ordering[T]
-  ): Unit =
+  ): Int =
+    var outputSize = -1
+
     (1 to levels).foreach { level =>
       val inputDevices = devices.filter(_.nonEmpty)
       val outputDevice = devices.find(_.isEmpty).get
@@ -57,10 +62,13 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
         val blocks = inputDevices.map(_.read(delimeters.head))
         if level == levels then
           outputDevice.write(output, blocks, delimeters.head)
+          outputSize = outputDevice.lastFileSize.getOrElse(-1)
         else
           outputDevice.write(blocks, delimeters.head)
       }
     }
+
+    outputSize
 
   def getDeviceIndexToWrite(deltas: Seq[Int]): (Int, Seq[Int]) =
     deltas.zipWithIndex.maxByOption(_._1) match {

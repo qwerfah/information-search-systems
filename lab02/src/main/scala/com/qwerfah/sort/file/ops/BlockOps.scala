@@ -5,8 +5,9 @@ object BlockOps:
     * из них отсортирован в соответствии с переданным экземпялром Ordering.
     */
   def merge[T](blocks: Seq[Seq[T]])(using order: Ordering[T]): Seq[T] =
+    val filteredBlocks = blocks.filter(_.nonEmpty)
     val (newBlocks, sorted) =
-      blocks.flatMap(_.indices).foldLeft(blocks -> Seq.empty[T]) { case ((blocks, sorted), _) =>
+      filteredBlocks.flatMap(_.indices).foldLeft(filteredBlocks -> Seq.empty[T]) { case ((blocks, sorted), _) =>
         val (min, minInd) =
           blocks.zipWithIndex.tail.foldLeft(blocks.head.head -> 0) { case ((min, minInd), (block, blockInd)) =>
             if order.compare(block.head, min) < 0 then block.head -> blockInd
