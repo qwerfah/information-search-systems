@@ -3,9 +3,15 @@ package com.qwerfah.sort.file.devices
 import com.qwerfah.sort.file.ops.{BlockOps, FileOps}
 
 import java.io.{File, PrintWriter}
+import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable.Stack as MutableStack
+import scala.util.Random
 
 final case class LocalDevice(override val id: String, override val blockLength: Int) extends Device:
+  val dir: String = id + Random.alphanumeric.take(10).mkString
+
+  Files.createDirectory(Paths.get(dir))
+
   val files: MutableStack[File] = MutableStack.empty
   val fileSizes: MutableStack[Int] = MutableStack.empty
 
@@ -22,7 +28,7 @@ final case class LocalDevice(override val id: String, override val blockLength: 
     write(file, blocks, delim)
 
   override def write[T](blocks: Seq[Seq[T]], delim: String)(using order: Ordering[T]): Unit =
-    val file = new File(s"$id#file#${files.length}")
+    val file = new File(s"$dir/$id#file#${files.length}")
     write(file, blocks, delim)
 
   override def write[T](file: File, blocks: Seq[Seq[T]], delim: String)(using order: Ordering[T]): Unit =

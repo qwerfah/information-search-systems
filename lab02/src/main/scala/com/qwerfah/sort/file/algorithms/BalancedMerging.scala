@@ -37,36 +37,41 @@ final case class BalancedMerging(devices: Seq[Device], blockLength: Int) extends
       conversion: Conversion[String, T],
       order: Ordering[T]
   ): Int =
-    var inDevices = inOutDevices.in.filter(_.nonEmpty)
+    var inIndices = inOutDevices.in.zipWithIndex.filter(_._1.nonEmpty).map(_._2)
     val delim = delimeters.head
 
     // Сливаем, пока не останется два файла для слияния, это и будет результат
-    while inDevices.length > 2 do
-      val outDevices = inOutDevices.out
-      val outputs = Iterator.continually(outDevices.indices).flatten
+    while inIndices.length > 2 do
+      val outputs = Iterator.continually(inOutDevices.out.indices).flatten
 
       // Читаем из входных файлов, пока не прочитаем все
-      while inDevices.nonEmpty do
-        val blocks = inDevices.map(_.read(delim))
-        outDevices(outputs.next()).write(blocks, delim)
-        inDevices = inDevices.filter(_.nonEmpty)
+      while inIndices.nonEmpty do
+        println(s"$code: reading from devices: ${for i <- inIndices yield inOutDevices.in(i).id}")
+        val blocks = for i <- inIndices yield inOutDevices.in(i).read(delim)
+        println(s"$code: read blocks: $blocks")
+        val outInd = outputs.next()
+        inOutDevices.out(outInd).write(blocks, delim)
+        println(s"$code: wrote blocks to dev ${inOutDevices.out(outInd).id}")
+        inIndices = inOutDevices.in.zipWithIndex.filter(_._1.nonEmpty).map(_._2)
 
       inOutDevices = inOutDevices.swap
-      inDevices = inOutDevices.in.filter(_.nonEmpty)
+      inIndices = inOutDevices.in.zipWithIndex.filter(_._1.nonEmpty).map(_._2)
 
-    inDevices.foreach(dev => assert(dev.filesCount == 1))
+    for i <- inIndices do assert(inOutDevices.in(i).filesCount == 1)
 
     // Формируем и записываем результирующий блок
-    val blocks = inDevices.map(_.read(delim))
-    inDevices.head.write(output, blocks, delim)
-    inDevices.head.lastFileSize.getOrElse(-1)
+    println(s"$code: reading from devices: ${for i <- inIndices yield inOutDevices.in(i).id}")
+    val blocks = for i <- inIndices yield inOutDevices.in(i).read(delim)
+    println(s"$code: read blocks: $blocks")
+    inOutDevices.in.head.write(output, blocks, delim)
+    println(s"$code: wrote to result file")
+    inOutDevices.in.head.lastFileSize.getOrElse(-1)
 
   private def splitStage[T: ClassTag](input: String, delimeters: Seq[String])(using
       conversion: Conversion[String, T],
       order: Ordering[T]
   ): Unit =
-    val outDevices = inOutDevices.out
-    val roundRobin = Iterator.continually(outDevices.indices).flatten
+    val roundRobin = Iterator.continually(inOutDevices.out.indices).flatten
     val fileIterator = FileOps.fileIterator(input, delimeters)
     val delim = delimeters.head
 
@@ -74,5 +79,7 @@ final case class BalancedMerging(devices: Seq[Device], blockLength: Int) extends
       val block = fileIterator.take(blockLength).map(conversion(_)).toSeq
       print(s"$code: block read: ${block.mkString(delim)}\n")
       val writerInd = roundRobin.next
-      outDevices(writerInd).write(Seq(block), delim)
-      print(s"$code: block wrote to file ${outDevices(writerInd).id}\n")
+      inOutDevices.out(writerInd).write(Seq(block), delim)
+      print(s"$code: block wrote to file ${inOutDevices.out(writerInd).id}\n")
+
+    inOutDevices = inOutDevices.swap

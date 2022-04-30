@@ -10,7 +10,7 @@ object Main extends App:
   import ClassTags.given
   import Conversions.given
 
-  val devices =
+  def devices =
     LocalDevice("dev1", 3) ::
     LocalDevice("dev2", 3) ::
     LocalDevice("dev3", 3) ::
