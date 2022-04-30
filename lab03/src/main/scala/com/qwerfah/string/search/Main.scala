@@ -1,3 +1,5 @@
+package com.qwerfah.string.search
+
 @main def hello: Unit =
   println("Hello world!")
   println(msg)
