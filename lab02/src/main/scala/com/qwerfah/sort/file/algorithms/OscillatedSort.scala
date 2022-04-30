@@ -31,10 +31,17 @@ final case class OscillatedSort(devices: Seq[Device], blockLength: Int) extends 
 
     val delim = delimeters.head
 
+    println(s"$code: start spliting to devices with merge if ready ...")
+
     while fileIterator.hasNext do
       val block = fileIterator.take(blockLength).toSeq.map(conversion(_))
-      devices(splitRoundRobin.next).write(Seq(block), delim)
+      println(s"$code: read block from init file: $block")
+      val devInd = splitRoundRobin.next
+      devices(devInd).write(Seq(block), delim)
+      println(s"$code: write block to output device ${devices(devInd).id}")
       mergeIfReady(delim, mergeRoundRobin)
+
+    println(s"$code: end of init file, merging rest ...")
 
     val rest = Iterator
       .continually(devices.map(dev => dev.lastFileSize.getOrElse(0) -> dev.read(delim)).filter(_._2.nonEmpty))
@@ -50,6 +57,8 @@ final case class OscillatedSort(devices: Seq[Device], blockLength: Int) extends 
         resultWriter.close()
         outputSize = blocksWithSizes.head._1
       else devices(mergeRoundRobin.next).write(blocksWithSizes.map(_._2), delim)
+
+    println(s"$code: done")
 
     outputSize
   }
@@ -72,8 +81,12 @@ final case class OscillatedSort(devices: Seq[Device], blockLength: Int) extends 
 
     maybeDevicesToMerge match {
       case Some(devicesToMerge) =>
+        println(s"$code: devices ready to merge")
         val blocks = devicesToMerge.map(_.read(delim))
-        devices(mergeRoundRobin.next).write(blocks, delim)
+        println(s"$code: read blocks from ready devices: $blocks")
+        val devInd = mergeRoundRobin.next
+        devices(devInd).write(blocks, delim)
+        println(s"$code: write blocks to output device ${devices(devInd).id}")
         mergeIfReady(delim, mergeRoundRobin)
       case _ =>
     }

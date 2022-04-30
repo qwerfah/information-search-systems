@@ -20,8 +20,12 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
       conversion: Conversion[String, T],
       order: Ordering[T]
   ): Try[Int] = Try {
+    println(s"$code: spliting input file ...")
     val levels = splitStage(input, delimeters)
+    println(s"$code: spliting done with levels=$levels")
+    println(s"$code: merging ...")
     val outputSize = mergeStage(output, delimeters, levels)
+    println(s"$code: done")
     Files.write(Paths.get(output), " \n".getBytes(), StandardOpenOption.APPEND)
     outputSize
   }
@@ -39,9 +43,10 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
 
       (0 until deltas.sum).foldLeft(deltas) { case (deltas, _) =>
         val (devInd, newDeltas) = getDeviceIndexToWrite(deltas)
-        val sorted = fileIterator.take(blockLength).map(conversion(_)).toSeq.sorted
-
-        devices(devInd).write(Seq(sorted), delim)
+        val block = fileIterator.take(blockLength).map(conversion(_)).toSeq
+        println(s"$code: read block from init file: $block")
+        devices(devInd).write(Seq(block), delim)
+        println(s"$code: write block to device ${devices(devInd).id}")
         newDeltas
       }
       level + 1
@@ -57,14 +62,17 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
       val inputDevices = devices.filter(_.nonEmpty)
       val outputDevice = devices.find(_.isEmpty).get
       val blocksCount = inputDevices.map(_.filesCount).min
+      println(s"$code: merging from ${inputDevices.map(_.id)} to ${outputDevice.id} by $blocksCount per one device")
 
       (0 until blocksCount).foreach { _=>
         val blocks = inputDevices.map(_.read(delimeters.head))
+        println(s"$code: read blocks $blocks from ${inputDevices.map(_.id)}")
         if level == levels then
           outputDevice.write(output, blocks, delimeters.head)
           outputSize = outputDevice.lastFileSize.getOrElse(-1)
         else
           outputDevice.write(blocks, delimeters.head)
+        println(s"$code: write blocks to ${outputDevice.id}")
       }
     }
 

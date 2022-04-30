@@ -19,10 +19,10 @@ object Main extends App:
     LocalDevice("dev6", 3) :: Nil
 
   val balancedMerging = BalancedMerging(devices, 3)
-  println(s"Balanced merging: ${balancedMerging.sort("input", "output1", " " :: "\n" :: Nil)}")
+  println(s"\nBalanced merging: ${balancedMerging.sort("input", "output1", " " :: "\n" :: Nil)}\n")
 
   val oscillatedSort = OscillatedSort(devices, 3)
-  println(s"Oscillated sort: ${oscillatedSort.sort("input", "output2", " " :: "\n" :: Nil)}")
+  println(s"\nOscillated sort: ${oscillatedSort.sort("input", "output2", " " :: "\n" :: Nil)}\n")
 
   val polyphaseSort = PolyphaseSort(devices, 3)
-  println(s"polyphase sort: ${polyphaseSort.sort("input", "output3", " " :: "\n" :: Nil)}")
+  println(s"\npolyphase sort: ${polyphaseSort.sort("input", "output3", " " :: "\n" :: Nil)}\n")
