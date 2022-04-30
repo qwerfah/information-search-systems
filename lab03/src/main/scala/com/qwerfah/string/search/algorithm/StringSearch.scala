@@ -2,7 +2,8 @@ package com.qwerfah.string.search.algorithm
 
 trait StringSearch:
   def code: String
+
+  def search(needle: String, haystack: String): List[Int]
   
-  def search(needle: String, haystack: String): Int
-  
-  protected val notFound: Int = -1
+  protected final val notFound: List[Int] = List.empty
+  protected final val notIndex: Int = -1
