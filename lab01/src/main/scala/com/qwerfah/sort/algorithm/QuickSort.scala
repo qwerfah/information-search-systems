@@ -29,7 +29,7 @@ final case class QuickSortSE() extends SortAlgorithm:
       if first >= last then SortStats()
       else
         var (i, j) = (first, last)
-        val pivot = seq(first + Random.nextInt(last - first + 1))
+        val pivot = seq((first + last) / 2) // seq(first + Random.nextInt(last - first + 1))
 
         var permutations = 0
         var comparisons = 0
@@ -37,6 +37,7 @@ final case class QuickSortSE() extends SortAlgorithm:
         while i <= j do
           while order.compare(seq(i), pivot) < 0 do i += 1; comparisons += 1
           while order.compare(seq(j), pivot) > 0 do j -= 1; comparisons += 1
+          comparisons += 2
           if i <= j then
             val swap = seq(i)
             seq(i) = seq(j)
