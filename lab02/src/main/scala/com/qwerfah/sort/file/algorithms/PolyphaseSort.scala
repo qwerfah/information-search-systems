@@ -26,7 +26,7 @@ final case class PolyphaseSort(devices: Seq[Device], blockLength: Int) extends F
     println(s"$code: merging ...")
     val outputSize = mergeStage(output, delimeters, levels)
     println(s"$code: done")
-    Files.write(Paths.get(output), " \n".getBytes(), StandardOpenOption.APPEND)
+    //Files.write(Paths.get(output), " \n".getBytes(), StandardOpenOption.APPEND)
     outputSize
   }
 

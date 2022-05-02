@@ -8,10 +8,16 @@ import org.scalatest.matchers.should.Matchers
 import scala.reflect.ClassTag
 import scala.util.Success
 
+import com.qwerfah.sort.Conversions.given
+import com.qwerfah.sort.ClassTags.given
+
 trait SortSpec extends AnyFlatSpec with Matchers:
+  protected val expected =
+    Seq(1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 56)
+
   def sortSpec[TSort <: FileSort, TElem: ClassTag](
       factory: (Seq[Device], Int) => TSort,
-      sorted: Seq[TElem],
+      sorted: Seq[TElem] = expected,
       deviceCount: Int = 6,
       blockLength: Int = 3,
       input: String = "input",
@@ -27,37 +33,19 @@ trait SortSpec extends AnyFlatSpec with Matchers:
     sortAlgo.sort[TElem](input, output, delimeters) shouldBe 
       Success(math.ceil(sorted.length.toDouble / blockLength.toDouble).toInt)
     val resultIt = FileOps.fileIterator(output, delimeters)
-    resultIt.takeWhile(_ => resultIt.hasNext).map(conversion(_)).toSeq shouldBe sorted
+    resultIt.toList.map(conversion(_)).toSeq shouldBe sorted
 
 final class BalancedMergingSpec extends SortSpec:
-  private val expected =
-    Seq(1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 56)
-
   "BalancedMerging" should "sort correctly any file that can be splited into sequence of tokens" in {
-    import com.qwerfah.sort.Conversions.given
-    import com.qwerfah.sort.ClassTags.given
-
     sortSpec[BalancedMerging, Int]((devices, blockLength) => BalancedMerging(devices, blockLength), expected)
   }
 
 final class OscillatedSortSpec extends SortSpec:
-  private val expected =
-    Seq(1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 56)
-
   "OscillatedSort" should "sort correctly any file that can be splited into sequence of tokens" in {
-    import com.qwerfah.sort.Conversions.given
-    import com.qwerfah.sort.ClassTags.given
-
-    sortSpec[OscillatedSort, Int]((devices, blockLength) => OscillatedSort(devices, blockLength), expected)
+    sortSpec[OscillatedSort, Int]((devices, blockLength) => OscillatedSort(devices, blockLength))
   }
 
 final class PolyphaseSortSpec extends SortSpec:
-  private val expected =
-    Seq(1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 56)
-
   "PolyphaseSort" should "sort correctly any file that can be splited into sequence of tokens" in {
-    import com.qwerfah.sort.Conversions.given
-    import com.qwerfah.sort.ClassTags.given
-
-    sortSpec[PolyphaseSort, Int]((devices, blockLength) => PolyphaseSort(devices, blockLength), expected)
+    sortSpec[PolyphaseSort, Int]((devices, blockLength) => PolyphaseSort(devices, blockLength))
   }
