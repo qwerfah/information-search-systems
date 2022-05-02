@@ -11,4 +11,5 @@ trait StringSearchSpec extends munit.FunSuite:
     assertEquals(algo.search("some", "thingsome"), List(5))
     assertEquals(algo.search("some", "thingsomething"), List(5))
     assertEquals(algo.search("some", "thingsomethingsome"), List(5, 14))
+    assertEquals(algo.search("sos", "sosos"), List(0, 2))
   }

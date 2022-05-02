@@ -1,7 +1,8 @@
 package com.qwerfah.string.search
 
-@main def hello: Unit =
-  println("Hello world!")
-  println(msg)
+import com.qwerfah.string.search.algorithm.KnuthMorrisPratSearch
 
-def msg = "I was compiled by Scala 3. :)"
+@main def hello: Unit =
+  val search = KnuthMorrisPratSearch()
+  val pr = KnuthMorrisPratSearch.prefix("abcdabcabcdabcdab")
+  println(pr.toList)
